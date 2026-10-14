@@ -1,0 +1,159 @@
+{
+  "name": "codify",
+  "displayName": "Codify",
+  "description": "Synced Spotify lyrics for the track you're playing, right in your VS Code or Cursor sidebar and status bar. macOS only.",
+  "version": "0.1.0",
+  "publisher": "mps",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/local/codify"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "spotify",
+    "lyrics",
+    "music",
+    "karaoke",
+    "cursor",
+    "vscode"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "codify.sidebar",
+          "name": "Lyrics",
+          "icon": "$(music)"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "codify.showPanel",
+        "title": "Codify: Show Lyrics Panel"
+      },
+      {
+        "command": "codify.toggleStatusBar",
+        "title": "Codify: Toggle Status Bar Lyrics"
+      },
+      {
+        "command": "codify.refresh",
+        "title": "Codify: Reload Lyrics"
+      },
+      {
+        "command": "codify.playPause",
+        "title": "Codify: Play/Pause"
+      },
+      {
+        "command": "codify.next",
+        "title": "Codify: Next Track",
+        "icon": "$(chevron-right)"
+      },
+      {
+        "command": "codify.previous",
+        "title": "Codify: Previous Track",
+        "icon": "$(chevron-left)"
+      },
+      {
+        "command": "codify.play",
+        "title": "Codify: Play",
+        "icon": "$(play)"
+      },
+      {
+        "command": "codify.pause",
+        "title": "Codify: Pause",
+        "icon": "$(debug-pause)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "codify.previous",
+          "when": "view == codify.sidebar",
+          "group": "navigation@1"
+        },
+        {
+          "command": "codify.play",
+          "when": "view == codify.sidebar && !codify.playing",
+          "group": "navigation@2"
+        },
+        {
+          "command": "codify.pause",
+          "when": "view == codify.sidebar && codify.playing",
+          "group": "navigation@2"
+        },
+        {
+          "command": "codify.next",
+          "when": "view == codify.sidebar",
+          "group": "navigation@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codify.play",
+          "when": "false"
+        },
+        {
+          "command": "codify.pause",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Codify",
+      "properties": {
+        "codify.showInStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the active lyric line in the status bar."
+        },
+        "codify.sidebarAlign": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "left",
+            "right"
+          ],
+          "default": "auto",
+          "description": "Text alignment in the sidebar. 'auto' follows the sidebar position (left sidebar → left-aligned, right sidebar → right-aligned)."
+        },
+        "codify.offsetMs": {
+          "type": "number",
+          "default": 0,
+          "description": "Shift lyric timing in milliseconds. Positive values show lines earlier."
+        },
+        "codify.pollIntervalMs": {
+          "type": "number",
+          "default": 1000,
+          "minimum": 300,
+          "description": "How often to read the Spotify player state, in milliseconds."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p . && tsc -p src/webview",
+    "build": "npm run typecheck && npm run bundle",
+    "bundle": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.js && esbuild src/webview/main.ts --bundle --format=iife --outfile=dist/webview.js",
+    "watch": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.js --watch",
+    "vscode:prepublish": "npm run build",
+    "package": "npx --yes @vscode/vsce package --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/vscode": "~1.80.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}
